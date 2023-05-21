@@ -8,22 +8,21 @@
  *
  * Return: 0 on success, 1 otherwise
  */
-int main(int argc, char *argv[], char *env[])
+int main(__attribute__((unused)) int argc, char *argv[], char *env[])
 {
 	int status = 0, i = 1;
 	size_t len = 0;
 	ssize_t rd;
 	pid_t pid;
-	char *line = NULL, **tokens, *prompt = "$ ";
+	char *line = NULL, **tokens = NULL, *prompt = "$ ";
 
-	(void)argc;
 	if (isatty(STDIN_FILENO) == 1)
 		_puts(prompt);
 	while ((rd = getline(&line, &len, stdin)) != -1)
 	{
 		if (strlen(line) > 1)
 		{
-			remove_newline(&line);
+			remove_newline(line);
 			tokens = tokenizer(line, " ");
 			pid = fork();
 			if (pid == 0)
@@ -41,8 +40,8 @@ int main(int argc, char *argv[], char *env[])
 		}
 		i++;
 		_puts(prompt);
+		fflush(stdin);
 	}
-
 	if (rd == -1 && isatty(STDIN_FILENO) == 1)
 		_putchar('\n');
 	free(line);
