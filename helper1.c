@@ -20,6 +20,8 @@ void remove_newline(char *str)
  * tokenizer - tokenizes the given string with respect to the given delimiter
  * @str: the given string
  * @delim: the delimiter
+ *
+ * Return: a NULL terminated array of strings
  */
 char **tokenizer(char *str, const char *delim)
 {
@@ -35,7 +37,7 @@ char **tokenizer(char *str, const char *delim)
 		exit(1);
 	}
 	token = strtok(s, delim);
-	while (token != NULL && i < MAX_ARGS)
+	while (token != NULL && i < MAX_ARGS - 1)
 	{
 		tokens[i] = strdup(token);
 		token = strtok(NULL, delim);
@@ -108,6 +110,7 @@ char *find_path(char *cmd)
 		if (access(full, X_OK) == 0)
 		{
 			free(dirs);
+			cmd = full;
 			return (full);
 		}
 		i++;
@@ -121,8 +124,38 @@ char *find_path(char *cmd)
 /**
  * run_command - runs the command
  * @args: the commands
+ * @name: the name of the caller
+ * @env: environmen variables ofthe caller
+ * @i: the command count
  */
-void run_command(char **args)
+void run_command(char **args, char *name, char **env, int i)
 {
-	(void)args;	
+	char *path;
+	pid_t pid;
+	int err = 0;
+
+	if (args == NULL || *args == NULL)
+		return;
+	path = find_path(args[0]);
+	if (run_built_in(args) == 0)
+		err = 1;
+	if (path == NULL)
+	{
+		error(name, i, args[0]);
+		err = 1;
+	}
+	if (!err)
+	{
+		pid = fork();
+		if (pid == -1)
+			error(name, i, "fork");
+		else if (pid == 0)
+		{
+			if (execve(path, args, env) == -1)
+				error(name, i, "execve");
+		}
+		else
+			wait(NULL);
+	}
+
 }
