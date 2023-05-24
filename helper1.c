@@ -36,11 +36,11 @@ char **tokenizer(char *str, const char *delim)
 		perror("malloc");
 		exit(1);
 	}
-	token = strtok(s, delim);
+	token = _strtok(s, delim);
 	while (token != NULL && i < MAX_ARGS - 1)
 	{
 		tokens[i] = strdup(token);
-		token = strtok(NULL, delim);
+		token = _strtok(NULL, delim);
 		i++;
 	}
 	tokens[i] = NULL;
@@ -49,42 +49,22 @@ char **tokenizer(char *str, const char *delim)
 }
 
 /**
- * _getenv - our own getenv function
- * @var: the environment variable
- *
- * Return: the value of the environment variable or NULL
+ * error - prints error
+ * @name: name of the program
+ * @i: command count error
+ * @str: error string
+ * @msg: the error message
  */
-char *_getenv(char *var)
+void error(char *name, int i, char *str, char *msg)
 {
-	int i = 0;
-	char **env = environ;
-	char *key, *value, *temp, *res;
-
-	if (var == NULL)
-		return (NULL);
-	while (env[i] != NULL)
-	{
-		temp = strdup(env[i]);
-		key = strtok(temp, "=");
-		value = strtok(NULL, "=");
-		if (strcmp(key, var) == 0)
-		{
-			res = strdup(value);
-			free(temp);
-			return (res);
-		}
-		i++;
-		free(temp);
-	}
-
-	return (NULL);
+	dprintf(STDERR_FILENO, "%s: %i: %s: %s\n", name, i, str, msg);
 }
 
 /**
  * find_path - finds the path of a command
  * @cmd: the command
  *
-i* Return: the full path if found else NULL
+ * Return: the full path if found else NULL
  */
 char *find_path(char *cmd)
 {
@@ -132,30 +112,36 @@ void run_command(char **args, char *name, char **env, int i)
 {
 	char *path;
 	pid_t pid;
-	int err = 0;
+	int err = 0, b = 1;
 
 	if (args == NULL || *args == NULL)
 		return;
-	path = find_path(args[0]);
-	if (run_built_in(args) == 0)
-		err = 1;
-	if (path == NULL)
+	b = run_built_in(args);
+	if (b == -1)
 	{
-		error(name, i, args[0]);
+		error(name, i, args[0], "error");
+		err = 1;
+	}
+	else if (b == 0)
+		err = 1;
+	path = find_path(args[0]);
+	if (path == NULL && !err)
+	{
+		error(name, i, args[0], "not found");
 		err = 1;
 	}
 	if (!err)
 	{
 		pid = fork();
 		if (pid == -1)
-			error(name, i, "fork");
+			error(name, i, "fork", "Can't create another process");
 		else if (pid == 0)
 		{
 			if (execve(path, args, env) == -1)
-				error(name, i, "execve");
+				error(name, i, "execve", "No such file or directory");
 		}
 		else
 			wait(NULL);
 	}
-
+	free(path);
 }

@@ -30,15 +30,35 @@ int _puts(char *str)
 }
 
 /**
- * error - prints error
- * @name: name of the program
- * @i: command count error
- * @str: error string
+ * _getenv - our own getenv function
+ * @var: the environment variable
+ *
+ * Return: the value of the environment variable or NULL
  */
-void error(char *name, int i, char *str)
+char *_getenv(char *var)
 {
-	dprintf(STDERR_FILENO, "%s: %i: %s: ", name, i, str);
-	perror(NULL);
+	int i = 0;
+	char **env = environ;
+	char *key, *value, *temp, *res;
+
+	if (var == NULL)
+		return (NULL);
+	while (env[i] != NULL)
+	{
+		temp = strdup(env[i]);
+		key = strtok(temp, "=");
+		value = strtok(NULL, "=");
+		if (strcmp(key, var) == 0)
+		{
+			res = strdup(value);
+			free(temp);
+			return (res);
+		}
+		i++;
+		free(temp);
+	}
+
+	return (NULL);
 }
 
 /**
@@ -74,10 +94,10 @@ ssize_t _getline(char **lineptr, size_t *n, FILE *stream)
 		}
 		strcpy(*lineptr + total, buffer);
 		total += len;
-		if ((*lineptr)[total -1] == '\n')
+		if ((*lineptr)[total - 1] == '\n')
 			return (total);
 	}
-	
+
 	return (-1);
 }
 
@@ -90,26 +110,6 @@ ssize_t _getline(char **lineptr, size_t *n, FILE *stream)
  */
 char *_strtok(char *str, const char *delim)
 {
-	/*
-	static char *last = NULL;
-	char *token;
-
-	if (str != NULL)
-		last = str;
-	if (last == NULL)
-		return (NULL);
-	while (*last != '\0')
-	{
-		if (strchr(delim, *last) != NULL)
-		{
-			*last = '\0';
-			last++;
-			return (token);
-		}
-		last++;
-	}
-	return (token);
-	*/
 	static char *last;
 	char *token;
 
@@ -128,5 +128,6 @@ char *_strtok(char *str, const char *delim)
 	if (str != NULL)
 		*str++ = '\0';
 	last = str;
+
 	return (token);
 }
