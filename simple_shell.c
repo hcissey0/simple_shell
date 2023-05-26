@@ -117,43 +117,37 @@ void run_command(char **args, char *name, char **env, int i, int *ex)
 {
 	char *path;
 	pid_t pid;
-	int err = 0, b = 1, status;
+	int b = 1, status;
 
-	if (args == NULL || *args == NULL)
-		return;
 	b = run_built_in(args);
 	if (b == -1)
 	{
 		error(name, i, args[0], "error");
-		err = 1;
+		return;
 	}
 	else if (b == 0)
-		err = 1;
+		return;
 	path = find_path(args[0]);
-	if (path == NULL && !err)
+	if (path == NULL)
 	{
 		error(name, i, args[0], "not found");
-		err = 1;
 		*ex = 127;
 		return;
 	}
-	if (!err)
+	pid = fork();
+	if (pid == -1)
+		error(name, i, "fork", "Can't create another process");
+	else if (pid == 0)
 	{
-		pid = fork();
-		if (pid == -1)
-			error(name, i, "fork", "Can't create another process");
-		else if (pid == 0)
-		{
-			if (execve(path, args, env) == -1)
-				perror(args[0]);
-		}
-		else
-		{
-			if (wait(&status) == -1)
-				perror("wait");
-			else if (WIFEXITED(status))
-				*ex = WEXITSTATUS(status);
-		}
+		if (execve(path, args, env) == -1)
+			perror(args[0]);
+	}
+	else
+	{
+		if (wait(&status) == -1)
+			perror("wait");
+		else if (WIFEXITED(status))
+			*ex = WEXITSTATUS(status);
 	}
 	free(path);
 }
