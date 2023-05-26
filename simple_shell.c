@@ -83,6 +83,8 @@ char *find_path(char *cmd)
 	if (access(cmd, X_OK) == 0)
 		return (strdup(cmd));
 	path = _getenv("PATH");
+	if (path == NULL)
+		return (NULL);
 	dirs = tokenizer(path, ":");
 	while (dirs[i] != NULL)
 	{
