@@ -29,7 +29,7 @@ typedef struct builtin
 /* simple_shell.c */
 int check_spaces(char *);
 char *find_path(char *);
-void run_command(char **, char *, char **, int);
+void run_command(char **, char *, char **, int, int *);
 int run_built_in(char **);
 
 /* string0.c */

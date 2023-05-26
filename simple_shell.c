@@ -32,7 +32,7 @@ int main(__attribute__((unused)) int argc, char *argv[], char *env[])
 				free_tokens(tokens);
 				break;
 			}
-			run_command(tokens, argv[0], env, i);
+			run_command(tokens, argv[0], env, i, &ex);
 			free_tokens(tokens);
 		}
 		i++;
@@ -114,8 +114,9 @@ char *find_path(char *cmd)
  * @name: the name of the caller
  * @env: environmen variables ofthe caller
  * @i: the command count
+ * @ex: exit status
  */
-void run_command(char **args, char *name, char **env, int i)
+void run_command(char **args, char *name, char **env, int i, int *ex)
 {
 	char *path;
 	pid_t pid;
@@ -136,6 +137,7 @@ void run_command(char **args, char *name, char **env, int i)
 	{
 		error(name, i, args[0], "not found");
 		err = 1;
+		*ex = 127;
 		return;
 	}
 	if (!err)
