@@ -50,6 +50,8 @@ char *_getenv(char *var)
 		value = strtok(NULL, "=");
 		if (strcmp(key, var) == 0)
 		{
+			if (strlen(value) < 1)
+				return (NULL);
 			res = strdup(value);
 			free(temp);
 			return (res);
