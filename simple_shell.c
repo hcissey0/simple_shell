@@ -36,16 +36,13 @@ int main(__attribute__((unused)) int argc, char *argv[], char *env[])
 			free_tokens(tokens);
 		}
 		i++;
-
 		if (isatty(STDIN_FILENO) == 1)
 			_puts(prompt);
 	}
 	if (rd == -1 && isatty(STDIN_FILENO) == 1)
 		_putchar('\n');
 	free(line);
-	if (ex)
-		return (ex);
-	return (0);
+	return (ex);
 }
 
 /**
@@ -120,7 +117,7 @@ void run_command(char **args, char *name, char **env, int i, int *ex)
 {
 	char *path;
 	pid_t pid;
-	int err = 0, b = 1;
+	int err = 0, b = 1, status;
 
 	if (args == NULL || *args == NULL)
 		return;
@@ -151,7 +148,12 @@ void run_command(char **args, char *name, char **env, int i, int *ex)
 				perror(args[0]);
 		}
 		else
-			wait(NULL);
+		{
+			if (wait(&status) == -1)
+				perror("wait");
+			else if (WIFEXITED(status))
+				*ex = WEXITSTATUS(status);
+		}
 	}
 	free(path);
 }

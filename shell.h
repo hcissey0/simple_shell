@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include <errno.h>
 
 #define MAX_PATH_LEN 100
 #define MAX_CMD_LEN 100
