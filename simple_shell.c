@@ -19,10 +19,12 @@ int main(__attribute__((unused)) int argc, char *argv[], char *env[])
 		_puts(prompt);
 	while ((rd = _getline(&line, &len, stdin)) != -1)
 	{
-		if (strlen(line) > 1)
+		if (strlen(line) > 1 && check_spaces(line) != 0)
 		{
 			remove_newline(line);
 			tokens = tokenizer(line, " ");
+			if (tokens == NULL)
+				continue;
 			if (strcmp(tokens[0], "exit") == 0)
 			{
 				if (tokens[1] != NULL)
@@ -43,6 +45,25 @@ int main(__attribute__((unused)) int argc, char *argv[], char *env[])
 	free(line);
 	if (ex)
 		return (ex);
+	return (0);
+}
+
+/**
+ * check_spaces - checks if a newline terminated string is all spaces
+ * @str: the string
+ *
+ * Return: 0 if true otherwise 1
+ */
+int check_spaces(char *str)
+{
+	unsigned int i = 0;
+
+	while (str[i] != '\n' && str[i] != '\0')
+	{
+		if (str[i] != ' ' && str[i] != '\t')
+			return (1);
+		i++;
+	}
 	return (0);
 }
 
@@ -125,7 +146,7 @@ void run_command(char **args, char *name, char **env, int i)
 		else if (pid == 0)
 		{
 			if (execve(path, args, env) == -1)
-				error(name, i, "execve", "No such file or directory");
+				perror(args[0]);
 		}
 		else
 			wait(NULL);

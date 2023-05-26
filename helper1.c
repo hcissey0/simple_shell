@@ -39,6 +39,8 @@ char **tokenizer(char *str, const char *delim)
 	token = _strtok(s, delim);
 	while (token != NULL && i < MAX_ARGS - 1)
 	{
+		if (token == NULL)
+			return (NULL);
 		tokens[i] = strdup(token);
 		token = _strtok(NULL, delim);
 		i++;

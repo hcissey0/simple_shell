@@ -26,6 +26,12 @@ typedef struct builtin
 	int (*func)(char **);
 } builtin_t;
 
+/* simple_shell.c */
+int check_spaces(char *);
+char *find_path(char *);
+void run_command(char **, char *, char **, int);
+int run_built_in(char **);
+
 /* string0.c */
 int _strlen(char *);
 char *_strcpy(char *, char *);
@@ -49,12 +55,9 @@ char *_strtok(char *, const char *);
 /* helper1.c */
 void remove_newline(char *);
 char **tokenizer(char *, const char *);
-char *find_path(char *);
-void run_command(char **, char *, char **, int);
 void error(char *, int, char *, char *);
 
 /* helper2.c */
-int run_built_in(char **);
 int _setenv(char *, char *, int);
 int _unsetenv(char *);
 int cd(char **);
