@@ -61,7 +61,7 @@ int cd(char **);
 
 /* builtins.c */
 int print_env(char **);
-int exiter(char **);
+void free_tokens(char **);
 int env_setter(char **);
 int env_unsetter(char **);
 

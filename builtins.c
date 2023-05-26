@@ -25,20 +25,18 @@ int print_env(char **args)
 }
 
 /**
- * exiter - exits the program
+ * free_tokens - exits the program
  * @args: the arguments
  *
  * Return: Always 0
  */
-int exiter(char **args)
+void free_tokens(char **tokens)
 {
 	int i = 0;
 
-	if (args[1] != NULL)
-		i = atoi(args[1]);
-	exit(i);
-
-	return (0);
+	while (tokens[i] != NULL)
+		free(tokens[i++]);
+	free(tokens);
 }
 
 /**
