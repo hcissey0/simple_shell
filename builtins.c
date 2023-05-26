@@ -26,7 +26,7 @@ int print_env(char **args)
 
 /**
  * free_tokens - exits the program
- * @args: the arguments
+ * @tokens: the arguments
  *
  * Return: Always 0
  */

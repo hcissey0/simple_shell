@@ -143,10 +143,8 @@ void run_command(char **args, char *name, char **env, int i, int *ex)
 		if (pid == -1)
 			error(name, i, "fork", "Can't create another process");
 		else if (pid == 0)
-		{
 			if (execve(path, args, env) == -1)
 				perror(args[0]);
-		}
 		else
 		{
 			if (wait(&status) == -1)
